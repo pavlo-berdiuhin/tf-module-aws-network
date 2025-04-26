@@ -16,7 +16,7 @@ data "aws_availability_zones" "this" {}
 
 
 locals {
-  azs = slice(data.aws_availability_zones.this.names, 0, 3)
+  azs               = slice(data.aws_availability_zones.this.names, 0, 3)
   deployment_prefix = "${var.environment}-${var.stack}"
 }
 
@@ -76,10 +76,10 @@ module "vpc_endpoints" {
 
   endpoints = {
     s3 = {
-      service = "s3"
+      service         = "s3"
       service_type    = "Gateway"
       route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
-      tags    = { Name = "${local.deployment_prefix}-s3" }
+      tags            = { Name = "${local.deployment_prefix}-s3" }
     },
     dynamodb = {
       service         = "dynamodb"
@@ -88,20 +88,20 @@ module "vpc_endpoints" {
       policy          = data.aws_iam_policy_document.generic_endpoint_policy.json
       tags            = { Name = "${local.deployment_prefix}-dynamodb" }
     },
-     ecr_api = {
-       service             = "ecr.api"
-       private_dns_enabled = true
-       subnet_ids          = module.vpc.private_subnets
-       policy              = data.aws_iam_policy_document.generic_endpoint_policy.json
-       tags                = { Name = "${local.deployment_prefix}-ecr-api" }
-     },
-     ecr_dkr = {
-       service             = "ecr.dkr"
-       private_dns_enabled = true
-       subnet_ids          = module.vpc.private_subnets
-       policy              = data.aws_iam_policy_document.generic_endpoint_policy.json
-       tags                = { Name = "${local.deployment_prefix}-ecr-dkr" }
-     },
+    ecr_api = {
+      service             = "ecr.api"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets
+      policy              = data.aws_iam_policy_document.generic_endpoint_policy.json
+      tags                = { Name = "${local.deployment_prefix}-ecr-api" }
+    },
+    ecr_dkr = {
+      service             = "ecr.dkr"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets
+      policy              = data.aws_iam_policy_document.generic_endpoint_policy.json
+      tags                = { Name = "${local.deployment_prefix}-ecr-dkr" }
+    },
   }
 }
 
