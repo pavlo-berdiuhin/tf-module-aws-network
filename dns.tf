@@ -4,14 +4,14 @@
 resource "aws_route53_zone" "public" {
   for_each = toset([for domain, cfg in var.dns_domain_configs : domain if cfg.public_zone])
 
-  name = each.value
+  name = each.key
 }
 
 
 resource "aws_route53_zone" "private" {
   for_each = toset([for domain, cfg in var.dns_domain_configs : domain if cfg.private_zone])
 
-  name = each.value
+  name = each.key
   vpc {
     vpc_id = module.vpc.vpc_id
   }
@@ -26,7 +26,7 @@ resource "aws_route53_zone" "private" {
 resource "aws_acm_certificate" "this" {
   for_each = toset([for domain, cfg in var.dns_domain_configs : domain if cfg.create_certificate])
 
-  domain_name       = "*.${each.value}"
+  domain_name       = "*.${each.key}"
   validation_method = "DNS"
 
   depends_on = [
@@ -37,17 +37,17 @@ resource "aws_acm_certificate" "this" {
 
 
 resource "aws_route53_record" "cert_validation" {
-  for_each = aws_acm_certificate.this
+  for_each = toset([for domain, cfg in var.dns_domain_configs : domain if cfg.create_certificate])
 
-  zone_id = lookup(
-    aws_route53_zone.public,
-    each.key,
-    aws_route53_zone.private[each.key].zone_id
-  )
-  name    = each.value.domain_validation_options[0].resource_record_name
-  type    = each.value.domain_validation_options[0].resource_record_type
-  ttl     = 60
-  records = [each.value.domain_validation_options[0].resource_record_value]
+  zone_id = aws_route53_zone.public[each.key].zone_id
+  name    = tolist(aws_acm_certificate.this[each.key].domain_validation_options)[0].resource_record_name
+  type    = tolist(aws_acm_certificate.this[each.key].domain_validation_options)[0].resource_record_type
+  records = [
+    tolist(aws_acm_certificate.this[each.key].domain_validation_options)[0].resource_record_value
+  ]
+  ttl = 60
+
+  depends_on = [aws_acm_certificate.this]
 }
 
 
