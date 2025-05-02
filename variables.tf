@@ -74,3 +74,13 @@ variable "enable_nat_gateway" {
   description = "Enable NAT gateway"
   default     = true
 }
+
+variable "dns_domain_configs" {
+  description = "Route53 dns_zones"
+  type = map(object({
+    private_zone       = optional(bool, true)
+    public_zone        = optional(bool, false)
+    create_certificate = optional(bool, false)
+  }))
+  default = {}
+}

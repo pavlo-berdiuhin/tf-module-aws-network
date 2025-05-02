@@ -22,3 +22,14 @@ output "database_subnets_ids" {
   value       = module.vpc.database_subnets
   description = "VPC database subnets IDs"
 }
+
+output "dns_domain_configs" {
+  description = "Map of domain names to their Route53 zone IDs and ACM certificate ARNs"
+  value = {
+    for domain, cfg in var.dns_domain_configs : domain => {
+      private_zone_id = cfg.private_zone ? aws_route53_zone.private[domain].zone_id : null
+      public_zone_id  = cfg.public_zone ? aws_route53_zone.public[domain].zone_id : null
+      certificate     = cfg.create_certificate ? aws_acm_certificate.this[domain].arn : null
+    }
+  }
+}
