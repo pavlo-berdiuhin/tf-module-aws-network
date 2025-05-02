@@ -2,14 +2,14 @@
 # Route53 zones
 ################################################################################
 resource "aws_route53_zone" "public" {
-  for_each = [for domain, cfg in var.dns_domain_configs : domain if cfg.public_zone]
+  for_each = toset([for domain, cfg in var.dns_domain_configs : domain if cfg.public_zone])
 
   name = each.value
 }
 
 
 resource "aws_route53_zone" "private" {
-  for_each = [for domain, cfg in var.dns_domain_configs : domain if cfg.private_zone]
+  for_each = toset([for domain, cfg in var.dns_domain_configs : domain if cfg.private_zone])
 
   name = each.value
   vpc {
@@ -24,7 +24,7 @@ resource "aws_route53_zone" "private" {
 # ACM Certificates and Validations
 ################################################################################
 resource "aws_acm_certificate" "this" {
-  for_each = [for domain, cfg in var.dns_domain_configs : domain if cfg.create_certificate]
+  for_each = toset([for domain, cfg in var.dns_domain_configs : domain if cfg.create_certificate])
 
   domain_name       = "*.${each.value}"
   validation_method = "DNS"
