@@ -74,7 +74,7 @@ module "vpc_endpoints" {
     }
   }
 
-  endpoints = {
+  endpoints = merge({
     s3 = {
       service         = "s3"
       service_type    = "Gateway"
@@ -88,21 +88,7 @@ module "vpc_endpoints" {
       policy          = data.aws_iam_policy_document.generic_endpoint_policy.json
       tags            = { Name = "${local.deployment_prefix}-dynamodb" }
     },
-    ecr_api = {
-      service             = "ecr.api"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.private_subnets
-      policy              = data.aws_iam_policy_document.generic_endpoint_policy.json
-      tags                = { Name = "${local.deployment_prefix}-ecr-api" }
-    },
-    ecr_dkr = {
-      service             = "ecr.dkr"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.private_subnets
-      policy              = data.aws_iam_policy_document.generic_endpoint_policy.json
-      tags                = { Name = "${local.deployment_prefix}-ecr-dkr" }
-    },
-  }
+  }, var.additional_vpc_endpoints)
 }
 
 

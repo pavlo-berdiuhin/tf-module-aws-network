@@ -84,3 +84,9 @@ variable "dns_domain_configs" {
   }))
   default = {}
 }
+
+variable "additional_vpc_endpoints" {
+  description = "S3 and Dynamo endpoint installed by default. An additional map of interface and/or gateway endpoints containing their properties and configurations"
+  type        = any
+  default     = {}
+}

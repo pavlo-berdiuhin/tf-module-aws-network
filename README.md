@@ -40,6 +40,7 @@
 | <a name="input_additional_private_subnet_tags"></a> [additional\_private\_subnet\_tags](#input\_additional\_private\_subnet\_tags) | Additional tags for private subnets | `map(string)` | `{}` | no |
 | <a name="input_additional_public_subnet_tags"></a> [additional\_public\_subnet\_tags](#input\_additional\_public\_subnet\_tags) | Additional tags for public subnets | `map(string)` | `{}` | no |
 | <a name="input_additional_tags"></a> [additional\_tags](#input\_additional\_tags) | Additional tags for all resources | `map(string)` | `{}` | no |
+| <a name="input_additional_vpc_endpoints"></a> [additional\_vpc\_endpoints](#input\_additional\_vpc\_endpoints) | S3 and Dynamo endpoint installed by default. An additional map of interface and/or gateway endpoints containing their properties and configurations | `any` | `{}` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region were stack will be deployed | `string` | n/a | yes |
 | <a name="input_cidr"></a> [cidr](#input\_cidr) | VPC CIDR range | `string` | n/a | yes |
 | <a name="input_dns_domain_configs"></a> [dns\_domain\_configs](#input\_dns\_domain\_configs) | Route53 dns\_zones | <pre>map(object({<br/>    private_zone       = optional(bool, true)<br/>    public_zone        = optional(bool, false)<br/>    create_certificate = optional(bool, false)<br/>  }))</pre> | `{}` | no |
