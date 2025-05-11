@@ -29,7 +29,7 @@ output "dns_domain_configs" {
     for domain, cfg in var.dns_domain_configs : domain => {
       private_zone_id = cfg.private_zone ? aws_route53_zone.private[domain].zone_id : null
       public_zone_id  = cfg.public_zone ? aws_route53_zone.public[domain].zone_id : null
-      certificate     = cfg.create_certificate ? aws_acm_certificate.this[domain].arn : null
+      certificate     = cfg.create_certificate ? module.acm[domain].acm_certificate_arn : null
     }
   }
 }

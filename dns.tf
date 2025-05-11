@@ -23,39 +23,27 @@ resource "aws_route53_zone" "private" {
 ################################################################################
 # ACM Certificates and Validations
 ################################################################################
-resource "aws_acm_certificate" "this" {
+module "acm" {
+  source  = "terraform-aws-modules/acm/aws"
+  version = "5.1.1"
+
   for_each = toset([for domain, cfg in var.dns_domain_configs : domain if cfg.create_certificate])
 
-  domain_name       = "*.${each.key}"
+  domain_name = each.key
+  zone_id     = aws_route53_zone.public[each.key].zone_id
+
   validation_method = "DNS"
 
-  depends_on = [
-    aws_route53_zone.public,
-    aws_route53_zone.private
+  subject_alternative_names = [
+    "*.${each.key}",
+    "*.int.${each.key}",
+    "*.dev.${each.key}",
+    "*.stage.${each.key}",
   ]
-}
 
+  wait_for_validation = true
 
-resource "aws_route53_record" "cert_validation" {
-  for_each = toset([for domain, cfg in var.dns_domain_configs : domain if cfg.create_certificate])
-
-  zone_id = aws_route53_zone.public[each.key].zone_id
-  name    = tolist(aws_acm_certificate.this[each.key].domain_validation_options)[0].resource_record_name
-  type    = tolist(aws_acm_certificate.this[each.key].domain_validation_options)[0].resource_record_type
-  records = [
-    tolist(aws_acm_certificate.this[each.key].domain_validation_options)[0].resource_record_value
-  ]
-  ttl = 60
-
-  depends_on = [aws_acm_certificate.this]
-}
-
-
-resource "aws_acm_certificate_validation" "this" {
-  for_each = aws_acm_certificate.this
-
-  certificate_arn = each.value.arn
-  validation_record_fqdns = [
-    aws_route53_record.cert_validation[each.key].fqdn
-  ]
+  tags = {
+    Name = each.key
+  }
 }
